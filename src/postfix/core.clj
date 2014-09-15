@@ -9,6 +9,7 @@
 (defn postfix-do [command]
   (cond
    (integer? command) (fn [stack] (conj stack command))
+   (list? command) (fn [stack] (conj stack command))
    :else 'error))
 
 (defn postfix [num-params & prog]
