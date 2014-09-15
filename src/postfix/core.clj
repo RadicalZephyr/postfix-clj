@@ -1,6 +1,22 @@
 (ns postfix.core)
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(def special-commands '[add div eq exec gt lt mul nget pop rem sel swap])
+
+(defn correct-arg-count? [args expected]
+  (= (count args)
+     expected))
+
+(defn postfix-do [command]
+  (cond
+   (integer? command) (fn [stack] (conj stack command))
+   :else 'error))
+
+(defn postfix [num-params & prog]
+  (fn [& fn-args]
+    (when (not (correct-arg-count? fn-args num-params))
+      (println "Incorrect number of arguments: expected" num-params
+               ". Got " (count fn-args)))
+    (let [stack (atom (vec (reverse fn-args)))]
+      (doseq [head prog]
+        (swap! stack (postfix-do head)))
+      (peek @stack))))
