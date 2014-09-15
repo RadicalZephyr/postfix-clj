@@ -11,7 +11,10 @@
    (integer? command) (fn [stack] (conj stack command))
    (list? command) (fn [stack] (conj stack command))
    (symbol? command) (case command
-                       pop pop)
+                       pop pop
+                       swap (fn [stack] (let [top (peek stack)
+                                              next (peek (pop stack))]
+                                          (conj (conj stack top) next))))
    :else 'error))
 
 (defn postfix [num-params & prog]
