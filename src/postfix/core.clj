@@ -10,6 +10,8 @@
   (cond
    (integer? command) (fn [stack] (conj stack command))
    (list? command) (fn [stack] (conj stack command))
+   (symbol? command) (case command
+                       pop pop)
    :else 'error))
 
 (defn postfix [num-params & prog]
