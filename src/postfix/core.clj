@@ -30,7 +30,7 @@
        (if ~count-test
          (throw (ex-info ~exn-msg {})))
        (let ~(gen-let-bindings stack-name args)
-        ~forms))))
+        ~@forms))))
 
 (defpostfix-command add [stack top next]
   (conj stack (+ next top)))
