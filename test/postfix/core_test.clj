@@ -41,3 +41,8 @@
   (defbinary-op-test sub -)
   (defbinary-op-test mul *)
   (defbinary-op-test div /))
+
+(defmacro deftestaddproblem [op]
+  (let [test-args [3 1]
+        op-result (vector (apply op (reverse test-args)))]
+    `[~test-args ~op-result]))
