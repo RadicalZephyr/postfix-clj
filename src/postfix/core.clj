@@ -17,12 +17,12 @@
                                           (conj (conj stack top) next))))
    :else 'error))
 
-(defn postfix [num-params & prog]
-  (fn [& fn-args]
-    (when (not (correct-arg-count? fn-args num-params))
-      (println "Incorrect number of arguments: expected" num-params
-               ". Got " (count fn-args)))
-    (let [stack (atom (vec (reverse fn-args)))]
-      (doseq [head prog]
-        (swap! stack (postfix-do head)))
-      (peek @stack))))
+(defmacro postfix [num-params & prog]
+  `(fn [& fn-args#]
+     (when (not (correct-arg-count? fn-args# ~num-params))
+       (println "Incorrect number of arguments: expected" ~num-params
+                ". Got " (count fn-args#)))
+     (let [stack# (atom (vec (reverse fn-args#)))]
+       (doseq [head# ~prog]
+         (swap! stack# (postfix-do head#)))
+       (peek @stack#))))
