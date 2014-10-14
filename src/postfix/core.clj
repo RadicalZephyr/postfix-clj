@@ -32,6 +32,13 @@
        (let ~(gen-let-bindings stack-name args)
         ~forms))))
 
+(defpostfix-command add [stack top next]
+  (conj stack (+ next top)))
+
+(defpostfix-command sub [stack top next]
+  (conj stack (- next top)))
+
+
 (defn postfix-do [command]
   (cond
    (or (integer? command)
