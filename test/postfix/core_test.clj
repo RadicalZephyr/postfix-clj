@@ -25,7 +25,7 @@
         fn-name  (symbol (str cmd-name "-cmd"))
         test-args [3 1]
         op-result (vector (apply op (reverse test-args)))]
-    (prn "test-args:" test-args "\nop result:" op-result)
+    (prn "test-args:" test-args "op result:" op-result)
     `(testing ~(str cmd-name " command")
        (is (~'= (~fn-name ~test-args)
               ~op-result))
