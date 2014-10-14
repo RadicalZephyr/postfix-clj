@@ -6,6 +6,16 @@
   (= (count args)
      expected))
 
+(defmacro defpostfix-command [cmd-name [stack-name & args] & forms]
+  (let [num-args (count args)
+        cmd-name (name cmd-name)
+        exn-msg  (str cmd-name ": not enough values on the stack")
+        fn-name  (symbol (str cmd-name "-cmd"))]
+    `(defn ~fn-name [~stack-name]
+       (if (< (count ~stack-name) ~num-args)
+         (throw (ex-info ~exn-msg {})))
+       ~forms)))
+
 (defn postfix-do [command]
   (cond
    (or (integer? command)
