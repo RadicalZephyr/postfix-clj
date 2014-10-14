@@ -8,11 +8,16 @@
 
 (defmacro defpostfix-command [cmd-name [stack-name & args] & forms]
   (let [num-args (count args)
+        count-test (if (= num-args 1)
+                     `(empty? ~stack-name)
+                     `(< (count ~stack-name) ~num-args))
         cmd-name (name cmd-name)
-        exn-msg  (str cmd-name ": not enough values on the stack")
+        exn-msg  (str cmd-name ": " (if (= num-args 1)
+                                      "empty stack"
+                                      "not enough values on the stack"))
         fn-name  (symbol (str cmd-name "-cmd"))]
     `(defn ~fn-name [~stack-name]
-       (if (< (count ~stack-name) ~num-args)
+       (if ~count-test
          (throw (ex-info ~exn-msg {})))
        ~forms)))
 
