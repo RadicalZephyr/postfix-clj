@@ -11,7 +11,10 @@
    (integer? command) (fn [stack] (conj stack command))
    (list? command) (fn [stack] (conj stack command))
    (symbol? command) (case command
-                       pop pop
+                       pop (fn [stack]
+                             (if (empty? stack)
+                               (throw (ex-info "pop: empty stack" {})))
+                             (pop stack))
                        swap (fn [stack]
                               (if (< (count stack) 2)
                                 (throw (ex-info "swap: not enough values" {})))
