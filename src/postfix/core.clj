@@ -12,9 +12,12 @@
    (list? command) (fn [stack] (conj stack command))
    (symbol? command) (case command
                        pop pop
-                       swap (fn [stack] (let [top (peek stack)
-                                              next (peek (pop stack))]
-                                          (conj (conj stack top) next))))
+                       swap (fn [stack]
+                              (if (< (count stack) 2)
+                                (throw (ex-info "swap: not enough values" {})))
+                              (let [top (peek stack)
+                                    next (peek (pop stack))]
+                                (conj (conj stack top) next))))
    :else 'error))
 
 (defmacro postfix [num-params & prog]
