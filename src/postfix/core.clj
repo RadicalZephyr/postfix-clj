@@ -6,6 +6,16 @@
   (= (count args)
      expected))
 
+
+(defn gen-let-bindings [stack-name args]
+  (if (empty? args)
+    []
+    (into []
+          (apply concat
+           (map-indexed (fn [idx item]
+                          `[~item (nth ~stack-name ~idx)])
+                        args)))))
+
 (defmacro defpostfix-command [cmd-name [stack-name & args] & forms]
   (let [num-args (count args)
         count-test (if (= num-args 1)
@@ -19,7 +29,8 @@
     `(defn ~fn-name [~stack-name]
        (if ~count-test
          (throw (ex-info ~exn-msg {})))
-       ~forms)))
+       (let ~(gen-let-bindings stack-name args)
+        ~forms))))
 
 (defn postfix-do [command]
   (cond
