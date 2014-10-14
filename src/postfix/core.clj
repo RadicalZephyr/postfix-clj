@@ -20,7 +20,25 @@
                           `[~item (peek (popn ~stack-name ~idx))])
                         args)))))
 
-(defmacro defpostfix-command [cmd-name [stack-name & args] & forms]
+(defmacro defpostfix-command
+  "Define a function for use as a postfix command.
+
+  The function defined has the suffix \"-cmd\" appended to cmd-name.
+  Stack name is the variable that the stack is accesible under inside
+  the body of the command.
+
+  Automatic error checking is created based on the number of
+  arguments.  The remainder of the symbols found inside the parameter
+  vector are bound as the names for the current members of the stack,
+  in top down order.  The stack variable is the resulting stack after
+  all bound values have been popped off of the current stack.
+
+  Example: If the arg vector is [stack top next third] then the
+  function will require that the stack have at least three items, and
+  the top three items will be bound to top next and third respectively
+  while 'stack' will only contain the contents of the stack starting
+  _after_ the item third."
+  [cmd-name [stack-name & args] & forms]
   (let [num-args (count args)
         count-test (if (= num-args 1)
                      `(empty? ~stack-name)
