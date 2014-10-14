@@ -32,9 +32,9 @@
 
   (testing "Sub command"
     (is (= (sub-cmd [1 2])
-           [1]))
+           [-1]))
     (is (= (sub-cmd [0 3 2])
-           [0 -1]))
+           [0 1]))
     (is (thrown-with-msg? clojure.lang.ExceptionInfo
                           #"sub: not enough values on the stack"
                           (sub-cmd [1])))))
