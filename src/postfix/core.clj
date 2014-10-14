@@ -6,6 +6,10 @@
   (= (count args)
      expected))
 
+(defn popn [coll n]
+  (if (= n 0)
+    coll
+    (recur (pop coll) (dec n))))
 
 (defn gen-let-bindings [stack-name args]
   (if (empty? args)
@@ -13,7 +17,7 @@
     (into []
           (apply concat
            (map-indexed (fn [idx item]
-                          `[~item (nth ~stack-name ~idx)])
+                          `[~item (peek (popn ~stack-name ~idx))])
                         args)))))
 
 (defmacro defpostfix-command [cmd-name [stack-name & args] & forms]
