@@ -55,12 +55,14 @@
          (let [~stack-name (popn ~stack-name ~num-args)]
           ~@forms)))))
 
-(defpostfix-command add [stack top next]
-  (conj stack (+ next top)))
+(defmacro defpostfix-int-op [cmd-name fn]
+  `(defpostfix-command ~cmd-name [stack# top# next#]
+     (conj stack# (~fn next# top#))))
 
-(defpostfix-command sub [stack top next]
-  (conj stack (- next top)))
-
+(defpostfix-int-op add +)
+(defpostfix-int-op sub -)
+(defpostfix-int-op mul *)
+(defpostfix-int-op div /)
 
 (defn postfix-do [command]
   (cond
