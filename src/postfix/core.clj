@@ -8,8 +8,9 @@
 
 (defn postfix-do [command]
   (cond
-   (integer? command) (fn [stack] (conj stack command))
-   (list? command) (fn [stack] (conj stack command))
+   (or (integer? command)
+       (list?    command)) (fn [stack] (conj stack command))
+
    (symbol? command) (case command
                        pop (fn [stack]
                              (if (empty? stack)
