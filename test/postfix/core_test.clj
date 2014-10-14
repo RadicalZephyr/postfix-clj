@@ -1,6 +1,6 @@
 (ns postfix.core-test
   (:require [clojure.test :refer :all]
-            [postfix.core :refer [postfix]]))
+            [postfix.core :refer :all]))
 
 (deftest postfix-test
   (testing "Basic programs"
@@ -19,3 +19,22 @@
                           ((postfix 0 1 swap))))
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"pop: empty stack"
                           ((postfix 0 1 pop pop))))))
+
+(deftest subcommand-test
+  (testing "Add command"
+    (is (= (add-cmd [3 4])
+           [7]))
+    (is (= (add-cmd [0 3 2])
+           [0 5]))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"add: not enough values on the stack"
+                          (add-cmd [1]))))
+
+  (testing "Sub command"
+    (is (= (sub-cmd [1 2])
+           [1]))
+    (is (= (sub-cmd [0 3 2])
+           [0 -1]))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"sub: not enough values on the stack"
+                          (sub-cmd [1])))))
