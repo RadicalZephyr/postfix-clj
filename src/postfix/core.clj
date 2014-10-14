@@ -23,6 +23,6 @@
        (println "Incorrect number of arguments: expected" ~num-params
                 ". Got " (count fn-args#)))
      (let [stack# (atom (vec (reverse fn-args#)))]
-       (doseq [head# ~prog]
+       (doseq [head# '~prog]
          (swap! stack# (postfix-do head#)))
        (peek @stack#))))
