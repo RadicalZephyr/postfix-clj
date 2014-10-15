@@ -39,7 +39,7 @@
   (defbinary-op-test add +)
   (defbinary-op-test sub -)
   (defbinary-op-test mul *)
-  (defbinary-op-test div /)
+  (defbinary-op-test div quot)
   (defbinary-op-test rem rem)
 
   (testing "Pop command"
