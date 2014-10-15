@@ -68,6 +68,13 @@
 (defpostfix-int-op div /)
 (defpostfix-int-op rem rem)
 
+(defmacro defwrapped-cmp-operator [op-name fn]
+  `(do
+     (defn ~op-name [lhs# rhs#]
+       (if (~(eval fn) lhs# rhs#)
+         1 0))
+     (defpostfix-int-op ~op-name ~op-name)))
+
 (defn lt [lhs rhs]
   (if (< lhs rhs)
     1 0))
