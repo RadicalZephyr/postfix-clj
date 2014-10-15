@@ -92,6 +92,10 @@
 (defpostfix-command swap [stack top next]
   (conj (conj stack top) next))
 
+(defpostfix-command sel [stack v1 v2 v3]
+  (conj stack
+        (if (= v3 0)
+          v1 v2)))
 
 ;; Driver code for postfix interpreter
 
