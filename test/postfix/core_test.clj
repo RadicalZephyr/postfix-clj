@@ -42,6 +42,15 @@
   (defbinary-op-test div /)
   (defbinary-op-test rem rem)
 
+  (testing "Pop command"
+    (is (= (pop-cmd [1])
+           [])
+        (= (pop-cmd [0 1])
+           [0]))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"pop: empty stack"
+                          (pop-cmd []))))
+
   (testing "Swap command"
     (is (= (swap-cmd [1 3])
            [3 1]))
