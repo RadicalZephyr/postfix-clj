@@ -97,6 +97,19 @@
         (if (= v3 0)
           v1 v2)))
 
+(defpostfix-command nget [stack index]
+  (let [stack-len (count stack)]
+    (cond
+     (<= 1 index stack-len)
+     (let [item (nth stack (- stack-len index))]
+       (if (number? item)
+         (conj stack item)
+         (throw (ex-info
+                 (format "nget: value at index %d is not a number" index)
+                 {}))))
+     :else (throw (ex-info (format "nget: index %d is out of range"
+                                   index) {})))))
+
 ;; Driver code for postfix interpreter
 
 (defn get-postfix-cmd [cmd-sym]
