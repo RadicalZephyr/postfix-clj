@@ -59,10 +59,16 @@
   `(defpostfix-command ~cmd-name [stack# top# next#]
      (conj stack# (~fn next# top#))))
 
+
+;; Define all postfix binary operations
+
 (defpostfix-int-op add +)
 (defpostfix-int-op sub -)
 (defpostfix-int-op mul *)
 (defpostfix-int-op div /)
+
+
+;; Driver code for postfix interpreter
 
 (defn postfix-do [command]
   (cond
