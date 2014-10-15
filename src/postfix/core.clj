@@ -68,6 +68,12 @@
 (defpostfix-int-op div /)
 
 
+;; All other postfix keywords
+
+(defpostfix-command pop [stack top]
+  stack)
+
+
 ;; Driver code for postfix interpreter
 
 (defn postfix-do [command]
@@ -76,10 +82,7 @@
        (list?    command)) (fn [stack] (conj stack command))
 
    (symbol? command) (case command
-                       pop  (fn [stack]
-                              (if (empty? stack)
-                                (throw (ex-info "pop: empty stack" {})))
-                              (pop stack))
+                       pop pop-cmd
 
                        swap (fn [stack]
                               (if (< (count stack) 2)
