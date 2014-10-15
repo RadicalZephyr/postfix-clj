@@ -24,8 +24,7 @@
   (let [cmd-name (name cmd-name)
         fn-name  (symbol (str cmd-name "-cmd"))
         test-args [3 1]
-        op-result (vector (apply op (reverse test-args)))]
-    (prn "test-args:" test-args "op result:" op-result)
+        op-result (vector (apply (eval op) test-args))]
     `(testing ~(str cmd-name " command")
        (is (~'= (~fn-name ~test-args)
               ~op-result))
@@ -41,8 +40,3 @@
   (defbinary-op-test sub -)
   (defbinary-op-test mul *)
   (defbinary-op-test div /))
-
-(defmacro deftestaddproblem [op]
-  (let [test-args [3 1]
-        op-result (vector (apply op (reverse test-args)))]
-    `[~test-args ~op-result]))
