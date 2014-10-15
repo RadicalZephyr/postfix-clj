@@ -75,23 +75,13 @@
          1 0))
      (defpostfix-int-op ~op-name ~op-name)))
 
-(defn lt [lhs rhs]
-  (if (< lhs rhs)
-    1 0))
+(defwrapped-cmp-operator lt <)
+(defwrapped-cmp-operator lte <=)
 
-(defpostfix-int-op lt lt)
+(defwrapped-cmp-operator gt >)
+(defwrapped-cmp-operator gte >=)
 
-(defn gt [lhs rhs]
-  (if (> lhs rhs)
-    1 0))
-
-(defpostfix-int-op gt gt)
-
-(defn eq [lhs rhs]
-  (if (= lhs rhs)
-    1 0))
-
-(defpostfix-int-op eq eq)
+(defwrapped-cmp-operator eq =)
 
 
 ;; All other postfix keywords
