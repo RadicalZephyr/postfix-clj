@@ -89,12 +89,7 @@
 
                        swap swap-cmd
 
-                       sub  (fn [stack]
-                              (if (< (count stack) 2)
-                                (throw (ex-info "sub: not enough values")))
-                              (let [top (peek stack)
-                                    next (peek (pop stack))]
-                                (conj stack (- next top)))))
+                       sub  sub-cmd)
    :else 'error))
 
 (defmacro postfix [num-params & prog]
