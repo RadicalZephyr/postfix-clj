@@ -85,11 +85,12 @@
        (list?    command)) (fn [stack] (conj stack command))
 
    (symbol? command) (case command
-                       pop pop-cmd
-
+                       pop  pop-cmd
                        swap swap-cmd
-
-                       sub  sub-cmd)
+                       add  add-cmd
+                       sub  sub-cmd
+                       mul  mul-cmd
+                       div  div-cmd)
    :else 'error))
 
 (defmacro postfix [num-params & prog]
