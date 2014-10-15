@@ -55,4 +55,16 @@
     (is (= (swap-cmd [1 3])
            [3 1]))
     (is (= (swap-cmd [0 1 3])
-           [0 3 1]))))
+           [0 3 1])))
+
+  (testing "Sel command"
+    (is (= (sel-cmd [1 2 3])
+           [2])
+        (= (sel-cmd [0 2 3])
+           [3]))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"sel: not enough values on the stack"
+                          (sel-cmd [0 1])))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"sel: not enough values on the stack"
+                          (sel-cmd [0])))))
