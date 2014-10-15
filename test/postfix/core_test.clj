@@ -39,4 +39,10 @@
   (defbinary-op-test add +)
   (defbinary-op-test sub -)
   (defbinary-op-test mul *)
-  (defbinary-op-test div /))
+  (defbinary-op-test div /)
+
+  (testing "Swap command"
+    (is (= (swap-cmd [1 3])
+           [3 1]))
+    (is (= (swap-cmd [0 1 3])
+           [0 3 1]))))
