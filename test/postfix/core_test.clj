@@ -67,4 +67,7 @@
                           (sel-cmd [0 1])))
     (is (thrown-with-msg? clojure.lang.ExceptionInfo
                           #"sel: not enough values on the stack"
-                          (sel-cmd [0])))))
+                          (sel-cmd [0]))))
+  (testing "Nget command"
+    (is (= (nget-cmd [5 4 3 2 1 3])
+           [5 4 3 2 1 3]))))
