@@ -73,6 +73,9 @@
 (defpostfix-command pop [stack top]
   stack)
 
+(defpostfix-command swap [stack top next]
+  (conj (conj stack top) next))
+
 
 ;; Driver code for postfix interpreter
 
@@ -84,12 +87,7 @@
    (symbol? command) (case command
                        pop pop-cmd
 
-                       swap (fn [stack]
-                              (if (< (count stack) 2)
-                                (throw (ex-info "swap: not enough values" {})))
-                              (let [top (peek stack)
-                                    next (peek (pop stack))]
-                                (conj (conj stack top) next)))
+                       swap swap-cmd
 
                        sub  (fn [stack]
                               (if (< (count stack) 2)
