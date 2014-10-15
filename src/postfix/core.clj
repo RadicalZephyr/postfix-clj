@@ -95,19 +95,16 @@
 
 ;; Driver code for postfix interpreter
 
+(defn get-postfix-cmd [cmd-sym]
+  (let [cmd-sym (symbol (str (name cmd-sym) "-cmd"))]
+    (cmd-sym (ns-publics (find-ns 'postfix.core)))))
+
 (defn postfix-do [command]
   (cond
    (or (integer? command)
        (list?    command)) (fn [stack] (conj stack command))
 
-   (symbol? command) (case command
-                       pop  pop-cmd
-                       swap swap-cmd
-                       add  add-cmd
-                       sub  sub-cmd
-                       mul  mul-cmd
-                       div  div-cmd
-                       rem  rem-cmd)
+   (symbol? command) (get-postfix-cmd command)
    :else 'error))
 
 (defmacro postfix [num-params & prog]
