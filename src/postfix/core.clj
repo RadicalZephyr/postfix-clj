@@ -66,6 +66,7 @@
 (defpostfix-int-op sub -)
 (defpostfix-int-op mul *)
 (defpostfix-int-op div /)
+(defpostfix-int-op rem rem)
 
 
 ;; All other postfix keywords
@@ -90,7 +91,8 @@
                        add  add-cmd
                        sub  sub-cmd
                        mul  mul-cmd
-                       div  div-cmd)
+                       div  div-cmd
+                       rem  rem-cmd)
    :else 'error))
 
 (defmacro postfix [num-params & prog]
