@@ -68,6 +68,24 @@
 (defpostfix-int-op div /)
 (defpostfix-int-op rem rem)
 
+(defn lt [lhs rhs]
+  (if (< lhs rhs)
+    1 0))
+
+(defpostfix-int-op lt lt)
+
+(defn gt [lhs rhs]
+  (if (> lhs rhs)
+    1 0))
+
+(defpostfix-int-op gt gt)
+
+(defn eq [lhs rhs]
+  (if (= lhs rhs)
+    1 0))
+
+(defpostfix-int-op eq eq)
+
 
 ;; All other postfix keywords
 
