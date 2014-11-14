@@ -16,7 +16,13 @@
       (is (= ((postfix 2 swap) 3 4)
              4))
       (is (= ((postfix 3 pop swap) 3 4 5)
-             5))))
+             5))
+      (is (thrown-with-msg? clojure.lang.ArityException
+                            #"Wrong number of args \(1\) passed to: "
+                            ((postfix 2 swap) 3)))
+      (is (thrown-with-msg? clojure.lang.ArityException
+                            #"Wrong number of args \(0\) passed to: "
+                            ((postfix 1 pop))))))
 
   (testing "More complex commands"
     (is (= ((postfix 1 4 sub) 3)
