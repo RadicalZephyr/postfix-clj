@@ -55,11 +55,23 @@
     (postfix-test (postfix 1 4 lt 10 add)
                   [3] 11))
 
+  (testing "Programs with nget"
+    (postfix-test (postfix 2 1 nget)
+                  [4 5] 4)
+    (postfix-test (postfix 2 2 nget)
+                  [4 5] 5))
+
   (testing "Error productions"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"swap: not enough values"
                           ((postfix 0 1 swap))))
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"pop: empty stack"
-                          ((postfix 0 1 pop pop))))))
+                          ((postfix 0 1 pop pop))))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"nget: index \d+ is out of range"
+                          ((postfix 2 3 nget) 4 5)))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"nget: index \d+ is out of range"
+                          ((postfix 2 0 nget) 4 5)))))
 
 (defmacro defbinary-op-test [cmd-name op]
   (let [cmd-name (name cmd-name)
