@@ -2,14 +2,16 @@
   (:require [clojure.test :refer :all]
             [postfix.core :refer :all]))
 
+
+(defmacro test-postfix-program [postfix-prog args result]
+  `(is (~'= (~postfix-prog ~@args)
+            ~result)))
+
 (deftest postfix-test
   (testing "Basic programs"
-    (is (= ((postfix 0 1 2 3))
-           3) "Only the top stack value is returned.")
-    (is (= ((postfix 0 1 2 3 pop))
-           2))
-    (is (= ((postfix 0 1 2 swap 3 pop))
-           1)))
+    (test-postfix-program (postfix 0 1 2 3)          [] 3)
+    (test-postfix-program (postfix 0 1 2 3 pop)      [] 2)
+    (test-postfix-program (postfix 0 1 2 swap 3 pop) [] 1))
 
   (testing "Basic argument handling"
     (is (= ((postfix 2) 3 4) 3))
