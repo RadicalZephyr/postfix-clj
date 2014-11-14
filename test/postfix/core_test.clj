@@ -75,4 +75,7 @@
            [5 4 3 2 1 1]))
     (is (thrown-with-msg? clojure.lang.ExceptionInfo
                           #"nget: value at index \d+ is not a number"
-                          (nget-cmd [3 2 1 'pop 1])))))
+                          (nget-cmd [3 2 1 'pop 1])))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+                          #"nget: index value '\w*?' is not a number"
+                          (nget-cmd [3 2 1 'pop])))))
