@@ -9,6 +9,7 @@
       (is (= ((postfix 0 1 2 3 pop)) 2))
       (testing "and with swap"
         (is (= ((postfix 0 1 2 swap 3 pop)) 1)))))
+
   (testing "Basic argument handling"
     (is (= ((postfix 2) 3 4) 3))
     (testing "with pop and swap"
@@ -16,6 +17,13 @@
              4))
       (is (= ((postfix 3 pop swap) 3 4 5)
              5))))
+
+  (testing "More complex commands"
+    (is (= ((postfix 1 4 sub) 3)
+           -1))
+    (is (= ((postfix 1 4 add 5 mul 6 sub 7 div) 3)
+           4)))
+
   (testing "Error productions"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"swap: not enough values"
                           ((postfix 0 1 swap))))
