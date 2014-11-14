@@ -33,11 +33,27 @@
                             #"Wrong number of args \(0\) passed to: "
                             ((postfix 1 pop))))))
 
-  (testing "More complex commands"
+  (testing "Simple arithmetic programs"
     (postfix-test (postfix 1 4 sub)
                   [3] -1)
     (postfix-test (postfix 1 4 add 5 mul 6 sub 7 div)
-                  [3]  4))
+                  [3]  4)
+    (postfix-test (postfix 5 add mul sub swap div)
+                  [7 6 5 4 3] -20)
+    (postfix-test (postfix 3 4000 swap pop add)
+                  [300 20 1] 4020)
+    (postfix-test (postfix 2 add 2 div)
+                  [3 7] 5)
+    (postfix-test (postfix 1 3 div)
+                  [17] 5)
+    (postfix-test (postfix 1 3 rem)
+                  [17] 2)
+    (postfix-test (postfix 1 4 lt)
+                  [3] 1)
+    (postfix-test (postfix 1 4 lt)
+                  [5] 0)
+    (postfix-test (postfix 1 4 lt 10 add)
+                  [3] 11))
 
   (testing "Error productions"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"swap: not enough values"
