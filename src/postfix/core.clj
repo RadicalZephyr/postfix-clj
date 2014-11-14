@@ -65,7 +65,7 @@
 (defpostfix-int-op add +)
 (defpostfix-int-op sub -)
 (defpostfix-int-op mul *)
-(defpostfix-int-op div /)
+(defpostfix-int-op div quot)
 (defpostfix-int-op rem rem)
 
 (defmacro defwrapped-cmp-operator [op-name fn]
