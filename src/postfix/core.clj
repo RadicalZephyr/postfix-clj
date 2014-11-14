@@ -128,12 +128,14 @@
    (symbol? command) (get-postfix-cmd command)
    :else 'error))
 
+(defn make-param-list [num-params]
+  (vec (map #(symbol (str "a" %))
+            (range num-params))))
+
 (defmacro postfix [num-params & prog]
-  `(fn [& fn-args#]
-     (when (not (correct-arg-count? fn-args# ~num-params))
-       (println "Incorrect number of arguments: expected" ~num-params
-                ". Got " (count fn-args#)))
-     (let [stack# (atom (vec (reverse fn-args#)))]
-       (doseq [head# '~prog]
-         (swap! stack# (postfix-do head#)))
-       (peek @stack#))))
+  (let [arg-list (make-param-list num-params)]
+   `(fn ~arg-list
+      (let [stack# (atom ~(vec (reverse arg-list)))]
+        (doseq [head# '~prog]
+          (swap! stack# (postfix-do head#)))
+        (peek @stack#)))))
