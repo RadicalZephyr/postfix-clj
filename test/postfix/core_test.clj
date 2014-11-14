@@ -3,23 +3,29 @@
             [postfix.core :refer :all]))
 
 
-(defmacro test-postfix-program [postfix-prog args result]
+(defmacro postfix-test [postfix-prog args result]
   `(is (~'= (~postfix-prog ~@args)
             ~result)))
 
 (deftest postfix-test
   (testing "Basic programs"
-    (test-postfix-program (postfix 0 1 2 3)          [] 3)
-    (test-postfix-program (postfix 0 1 2 3 pop)      [] 2)
-    (test-postfix-program (postfix 0 1 2 swap 3 pop) [] 1))
+    (postfix-test (postfix 0 1 2 3)
+                  [] 3)
+    (postfix-test (postfix 0 1 2 3 pop)
+                  [] 2)
+    (postfix-test (postfix 0 1 2 swap 3 pop)
+                  [] 1))
 
   (testing "Basic argument handling"
-    (is (= ((postfix 2) 3 4) 3))
+    (postfix-test (postfix 2)
+                  [3 4] 3)
+
     (testing "with pop and swap"
-      (is (= ((postfix 2 swap) 3 4)
-             4))
-      (is (= ((postfix 3 pop swap) 3 4 5)
-             5))
+      (postfix-test (postfix 2 swap)
+                    [3 4]   4)
+      (postfix-test (postfix 3 pop swap)
+                    [3 4 5] 5)
+
       (is (thrown-with-msg? clojure.lang.ArityException
                             #"Wrong number of args \(1\) passed to: "
                             ((postfix 2 swap) 3)))
@@ -28,10 +34,10 @@
                             ((postfix 1 pop))))))
 
   (testing "More complex commands"
-    (is (= ((postfix 1 4 sub) 3)
-           -1))
-    (is (= ((postfix 1 4 add 5 mul 6 sub 7 div) 3)
-           4)))
+    (postfix-test (postfix 1 4 sub)
+                  [3] -1)
+    (postfix-test (postfix 1 4 add 5 mul 6 sub 7 div)
+                  [3]  4))
 
   (testing "Error productions"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"swap: not enough values"
