@@ -100,16 +100,17 @@
 (defpostfix-command nget [stack index]
   (let [stack-len (count stack)]
     (cond
-     (not (number? index))
-     (throw (ex-info (format "nget: index value '%s' is not an integer"
-                             index) {}))
-     (<= 1 index stack-len)
+     (and (number? index)
+          (<= 1 index stack-len))
      (let [item (nth stack (- stack-len index))]
        (if (number? item)
          (conj stack item)
          (throw (ex-info
                  (format "nget: value at index %d is not a number" index)
                  {}))))
+     (not (number? index))
+     (throw (ex-info (format "nget: index value '%s' is not a number"
+                             index) {}))
      :else (throw (ex-info (format "nget: index %d is out of range"
                                    index) {})))))
 
