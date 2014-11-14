@@ -100,6 +100,9 @@
 (defpostfix-command nget [stack index]
   (let [stack-len (count stack)]
     (cond
+     (not (number? index))
+     (throw (ex-info (format "nget: index value '%s' is not an integer"
+                             index) {}))
      (<= 1 index stack-len)
      (let [item (nth stack (- stack-len index))]
        (if (number? item)
