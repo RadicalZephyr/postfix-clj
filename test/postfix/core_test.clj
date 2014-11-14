@@ -12,8 +12,10 @@
   (testing "Basic argument handling"
     (is (= ((postfix 2) 3 4) 3))
     (testing "with pop and swap"
-      (is (= ((postfix 2 swap) 3 4) 4))
-      (is (= ((postfix 3 pop swap) 3 4 5)))))
+      (is (= ((postfix 2 swap) 3 4)
+             4))
+      (is (= ((postfix 3 pop swap) 3 4 5)
+             5))))
   (testing "Error productions"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"swap: not enough values"
                           ((postfix 0 1 swap))))
