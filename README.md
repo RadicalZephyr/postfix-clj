@@ -1,6 +1,6 @@
 # postfix
 
-[![Made at Hacker School](http://img.shields.io/badge/Made_At-Hacker_School-brightgreen.svg)](http://shields.io/)
+[![Made at the Recurse Center](http://img.shields.io/badge/Made_At-The_Recurse_Center-brightgreen.svg)](https://www.recurse.com)
 
 An implementation of the Postfix language from the first chapter of
 Design Concepts in Programming Languages.
