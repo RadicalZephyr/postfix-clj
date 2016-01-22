@@ -68,4 +68,10 @@
     (postfix-test (sut/postfix 1 2 3 sel)
                   [1] 3)
     (postfix-test (sut/postfix 1 2 3 sel)
-                  [0] 2)))
+                  [0] 2))
+
+  (t/testing "Programs with executable sequences"
+    (postfix-test (sut/postfix 0 (0 swap sub) 7 swap exec)
+                  [] -7)
+    (postfix-test (sut/postfix 0 (7 swap exec) (0 swap sub) swap exec)
+                  [] -7)))
