@@ -1,4 +1,6 @@
-(ns postfix.compiler)
+(ns postfix.compiler
+  (:refer-clojure :exclude [rem])
+  (:require [clojure.template :as template]))
 
 (defn swap [stack]
   (let [n1 (peek stack)
@@ -6,6 +8,33 @@
     (-> stack pop pop
         (conj n1)
         (conj n2))))
+
+(defn wrap-bool [f]
+  (fn [l r] (if (f l r) 1 0)))
+
+(def lt-fn `(wrap-bool <))
+(def gt-fn `(wrap-bool >))
+
+(defmacro defbinary-stack-op [name operator]
+  `(defn ~name [stack#]
+     (let [~'n1 (peek stack#)
+           ~'n2 (peek (pop stack#))]
+       (-> stack# pop pop
+           (conj `(~~operator ~~'n2 ~~'n1))))))
+
+(defmacro defbinary-stack-ops [& args]
+  `(template/do-template [name op]
+                         (defbinary-stack-op name op)
+                         ~@args))
+
+(defbinary-stack-ops
+  add +
+  sub -
+  mul *
+  div quot
+  rem clojure.core/rem
+  lt lt-fn
+  gt gt-fn)
 
 (defmulti compile-instruction
   (fn [stack instruction]
