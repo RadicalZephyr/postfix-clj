@@ -1,4 +1,4 @@
-(ns postfix.core)
+(ns postfix.interpreter)
 
 (def special-commands '[add div eq exec gt lt mul nget pop rem sel swap])
 
@@ -118,7 +118,7 @@
 
 (defn get-postfix-cmd [cmd-sym]
   (let [cmd-sym (symbol (str (name cmd-sym) "-cmd"))]
-    (cmd-sym (ns-publics (find-ns 'postfix.core)))))
+    (cmd-sym (ns-publics (find-ns 'postfix.interpreter)))))
 
 (defn postfix-do [command]
   (cond

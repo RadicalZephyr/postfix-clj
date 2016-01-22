@@ -1,7 +1,6 @@
-(ns postfix.core-test
+(ns postfix.interpreter-test
   (:require [clojure.test :refer :all]
-            [postfix.core :refer :all]))
-
+            [postfix.interpreter :refer :all]))
 
 (defmacro postfix-test [postfix-prog args result]
   `(is (~'= (~postfix-prog ~@args)
