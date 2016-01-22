@@ -15,12 +15,17 @@
 (def lt-fn `(wrap-bool <))
 (def gt-fn `(wrap-bool >))
 
+(defn make-operation [op l r]
+  (if (and (number? l) (number? r))
+    (op l r)
+    (list op l r)))
+
 (defmacro defbinary-stack-op [name operator]
   `(defn ~name [stack#]
      (let [~'n1 (peek stack#)
            ~'n2 (peek (pop stack#))]
        (-> stack# pop pop
-           (conj `(~~operator ~~'n2 ~~'n1))))))
+           (conj (make-operation ~operator ~'n2 ~'n1))))))
 
 (defmacro defbinary-stack-ops [& args]
   `(template/do-template [name op]
