@@ -21,11 +21,12 @@
 (defn sel [stack]
   (let [pred (peek (u/popn stack 2))
         else (peek (pop stack))
-        then (peek stack)]
+        then (peek stack)
+        stack (u/popn stack 3)]
     (if (number? pred)
       (if (= pred 0)
-        (-> stack pop pop pop (conj else))
-        (-> stack pop pop pop (conj then)))
+        (conj stack else)
+        (conj stack then))
       (conj stack `(if (= ~pred 0) ~else ~then)))))
 
 (defn exec [stack]
