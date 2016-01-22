@@ -1,4 +1,5 @@
 (ns postfix.compiler)
 
-(defmacro postfix [& args]
-  `#(identity 3))
+(defmacro postfix [num-args & program]
+  (let [ret (last program)]
+    `(constantly ~ret)))

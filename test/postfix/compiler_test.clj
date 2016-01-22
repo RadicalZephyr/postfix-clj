@@ -8,9 +8,13 @@
 
 (t/deftest postfix-test
   (t/testing "Basic programs"
+    (postfix-test (sut/postfix 0 1)
+                  [] 1)
+    (postfix-test (sut/postfix 0 2)
+                  [] 2)
     (postfix-test (sut/postfix 0 1 2 3)
-                  [] 3)
-    #_(postfix-test (sut/postfix 0 1 2 swap 3 pop)
-                    [] 1)
+                    [] 3)
     #_(postfix-test (sut/postfix 0 1 2 3 pop)
-                    [] 2)))
+                  [] 2)
+    #_(postfix-test (sut/postfix 0 1 2 swap 3 pop)
+                    [] 1)))
