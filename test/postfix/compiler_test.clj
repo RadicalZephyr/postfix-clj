@@ -1,10 +1,10 @@
 (ns postfix.compiler-test
   (:require [postfix.compiler :as sut]
-   [clojure.test :as t]))
+            [clojure.test :as t]))
 
 (defmacro postfix-test [postfix-prog args result]
   `(t/is (~'= (~postfix-prog ~@args)
-        ~result)))
+          ~result)))
 
 (t/deftest postfix-test
   (t/testing "Basic programs"
