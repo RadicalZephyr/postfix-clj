@@ -1,9 +1,10 @@
 (ns postfix.compiler
   (:refer-clojure :exclude [rem])
-  (:require [clojure.template :as template]
+  (:require [clojure.string :as str]
+            [clojure.template :as template]
             [postfix.util :as u]))
 
-(declare compile-instructions)
+(def postfix-arg (partial gensym "postfix-arg"))
 
 (defn swap [stack]
   (let [n1 (peek stack)
@@ -29,11 +30,21 @@
         (conj stack then))
       (conj stack `(if (= ~pred 0) ~else ~then)))))
 
+(defn executable-sequence? [val]
+  (and (seq? val)
+       (= (first val)
+          'clojure.core/fn)))
+
+(defn postfix-arg-sym? [val]
+  (and (symbol? val)
+       (-> val name (str/starts-with? "postfix-arg"))))
+
 (defn exec [stack]
   (let [top (peek stack)
         stack (pop stack)]
-    (if (vector? top)
-      (compile-instructions stack top)
+    (if (or (executable-sequence? top)
+            (postfix-arg-sym? top))
+      (conj stack `(~top ~@(take 2 (reverse stack))))
       (throw (ex-info "'exec' called on a non-executable sequence"
                       {:argument top :stack stack})))))
 
@@ -94,18 +105,23 @@
 (defmethod compile-instruction :command [stack instruction]
   ((lookup instruction) stack))
 
+(declare postfix*)
+
 (defmethod compile-instruction :executable-sequence [stack instruction]
-  (conj stack (vec instruction)))
+  (conj stack (postfix* 1 instruction)))
 
 (defn make-arg-vector [num-args]
-  (vec (repeatedly num-args (partial gensym "postfix-arg"))))
+  (vec (repeatedly num-args postfix-arg)))
 
 (defn compile-instructions [stack instructions]
   (reduce compile-instruction stack instructions))
 
-(defmacro postfix [num-args & program]
+(defn postfix* [num-args program]
   (let [program-args (make-arg-vector num-args)
         arg-stack (vec (reverse program-args))
         compiled-program (compile-instructions arg-stack program)
         ret (peek compiled-program)]
     `(fn ~program-args ~ret)))
+
+(defmacro postfix [num-args & program]
+  (postfix* num-args program))
