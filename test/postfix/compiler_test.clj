@@ -56,4 +56,10 @@
     (postfix-test (sut/postfix 1 5 gt)
                   [4] 0)
     (postfix-test (sut/postfix 1 4 lt 10 add)
-                  [3] 11)))
+                  [3] 11))
+
+  (t/testing "Programs with nget"
+    (postfix-test (sut/postfix 2 1 nget)
+                  [4 5] 4)
+    (postfix-test (sut/postfix 2 2 nget)
+                  [4 5] 5)))

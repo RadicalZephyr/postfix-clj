@@ -1,6 +1,7 @@
 (ns postfix.compiler
   (:refer-clojure :exclude [rem])
-  (:require [clojure.template :as template]))
+  (:require [clojure.template :as template]
+            [postfix.util :as u]))
 
 (defn swap [stack]
   (let [n1 (peek stack)
@@ -8,6 +9,12 @@
     (-> stack pop pop
         (conj n1)
         (conj n2))))
+
+(defn nget [stack]
+  (let [n (peek stack)
+        data (peek (u/popn stack n))]
+    (-> stack pop
+        (conj data))))
 
 (defn wrap-bool [f]
   (fn [l r] (if (f l r) 1 0)))
