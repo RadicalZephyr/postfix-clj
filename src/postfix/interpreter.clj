@@ -1,4 +1,5 @@
-(ns postfix.interpreter)
+(ns postfix.interpreter
+  (:require [postfix.util :as u]))
 
 (def special-commands '[add div eq exec gt lt mul nget pop rem sel swap])
 
@@ -6,18 +7,13 @@
   (= (count args)
      expected))
 
-(defn popn [coll n]
-  (if (= n 0)
-    coll
-    (recur (pop coll) (dec n))))
-
 (defn gen-let-bindings [stack-name args]
   (if (empty? args)
     []
     (into []
           (apply concat
            (map-indexed (fn [idx item]
-                          `[~item (peek (popn ~stack-name ~idx))])
+                          `[~item (peek (u/popn ~stack-name ~idx))])
                         args)))))
 
 (defmacro defpostfix-command
@@ -52,7 +48,7 @@
        (if ~count-test
          (throw (ex-info ~exn-msg {})))
        (let ~(gen-let-bindings stack-name args)
-         (let [~stack-name (popn ~stack-name ~num-args)]
+         (let [~stack-name (u/popn ~stack-name ~num-args)]
           ~@forms)))))
 
 (defmacro defpostfix-int-op [cmd-name fn]
