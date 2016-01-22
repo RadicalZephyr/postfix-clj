@@ -31,7 +31,12 @@
 (defmethod compile-instruction :symbol [stack instruction]
   ((lookup instruction) stack))
 
+(defn make-arg-vector [num-args]
+  (vec (repeatedly num-args (partial gensym "postfix-arg"))))
+
 (defmacro postfix [num-args & program]
-  (let [compiled-program (reduce compile-instruction [] program)
-        ret (last compiled-program)]
-    `(constantly ~ret)))
+  (let [program-args (make-arg-vector num-args)
+        arg-stack (vec (reverse program-args))
+        compiled-program (reduce compile-instruction arg-stack program)
+        ret (peek compiled-program)]
+    `(fn ~program-args ~ret)))
