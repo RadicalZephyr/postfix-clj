@@ -62,7 +62,7 @@
   (fn [stack instruction]
     (cond
       (number? instruction) :number
-      (symbol? instruction) :symbol
+      (symbol? instruction) :command
       :else :default)))
 
 (defmethod compile-instruction :default [stack instruction]
@@ -79,7 +79,7 @@
     (throw (ex-info "Could not resolve symbol"
                     {:instruction instruction}))))
 
-(defmethod compile-instruction :symbol [stack instruction]
+(defmethod compile-instruction :command [stack instruction]
   ((lookup instruction) stack))
 
 (defn make-arg-vector [num-args]
