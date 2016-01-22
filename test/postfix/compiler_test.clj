@@ -62,4 +62,10 @@
     (postfix-test (sut/postfix 2 1 nget)
                   [4 5] 4)
     (postfix-test (sut/postfix 2 2 nget)
-                  [4 5] 5)))
+                  [4 5] 5))
+
+  (t/testing "Programs with sel"
+    (postfix-test (sut/postfix 1 2 3 sel)
+                  [1] 3)
+    (postfix-test (sut/postfix 1 2 3 sel)
+                  [0] 2)))
