@@ -8,19 +8,28 @@
 (def postfix-arg (partial gensym "postfix-arg"))
 
 (defprotocol IPostfixProgram
-  (args-used [prog] "Return the number of args used by this program."))
+  (args-used [prog] "Return the number of args used by this program.")
+  (program-args [prog] "Return the argument vector for this program."))
 
-(deftype PostfixProgram [stack arg-source args-used]
+(deftype PostfixProgram [stack arg-source ^:volatile-mutable args-used]
   Seqable
   (seq [this] (seq stack))
 
   IPersistentStack
   (cons [this v] (PostfixProgram. (conj stack v) arg-source args-used))
-  (peek [this] nil)
-  (pop [this] this)
+  (peek [this] (if (seq stack)
+                 (peek stack)
+                 (do
+                   (when (= 0 args-used) (set! args-used 1))
+                   (nth arg-source args-used))))
+  (pop [this]
+    (if (seq stack)
+      (PostfixProgram. (pop stack) arg-source args-used)
+      (PostfixProgram. stack arg-source (inc args-used))))
 
   IPostfixProgram
-  (args-used [prog] args-used))
+  (args-used [prog] args-used)
+  (program-args [prog] (vec (take args-used arg-source))))
 
 (defn empty-program []
   (->PostfixProgram [] (repeatedly postfix-arg) 0))

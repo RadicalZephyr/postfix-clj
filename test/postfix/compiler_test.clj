@@ -1,8 +1,9 @@
 (ns postfix.compiler-test
-  (:require [postfix.compiler :as sut]
-            [clojure.test :as t]))
+  (:require [clojure.string :as str]
+            [clojure.test :as t]
+            [postfix.compiler :as sut]))
 
-(t/deftest postfix-program-test
+(t/deftest postfix-program-acts-like-a-stack
   (t/is (nil? (seq (sut/empty-program))))
 
   (t/is (= '(1)
@@ -10,7 +11,43 @@
                (conj 1)
                seq)))
 
-  (t/is (= 0 (sut/args-used (sut/empty-program)))))
+  (t/is (= 1 (-> (sut/empty-program)
+                 (conj 1)
+                 peek)))
+  (t/is (= 2 (-> (sut/empty-program)
+                 (conj 1 2)
+                 peek)))
+
+  (t/is (= 1 (-> (sut/empty-program)
+                 (conj 1 2)
+                 pop
+                 peek))))
+
+(t/deftest postfix-program-has-other-attributes
+  (t/testing "the empty program"
+   (t/is (= 0 (sut/args-used (sut/empty-program))))
+   (t/is (= [] (sut/program-args (sut/empty-program)))))
+
+  (t/testing "a program that has peeked at the first arg"
+   (let [program (doto (sut/empty-program) peek)
+         args    (sut/program-args program)]
+
+     (t/is (= 1 (sut/args-used program)))
+     (t/is (vector? args))
+     (t/is (= 1 (count args)))))
+
+  (t/testing "a program that has used more than one arg"
+   (let [program (sut/empty-program)
+         arg-sym1 (peek program)
+         program (pop program)
+         arg-sym2 (peek program)]
+
+     (t/is (symbol? arg-sym1))
+     (t/is (str/starts-with? (name arg-sym1) "postfix-arg"))
+     (t/is (not= arg-sym1 arg-sym2))
+
+     (t/is (= 2 (sut/args-used program)))
+     (t/is (= 2 (count (sut/program-args program)))))))
 
 (defmacro postfix-test [postfix-prog args result]
   `(t/is (~'= (~postfix-prog ~@args)
