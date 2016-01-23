@@ -2,12 +2,28 @@
   (:refer-clojure :exclude [rem])
   (:require [clojure.string :as str]
             [clojure.template :as template]
-            [postfix.util :as u]))
+            [postfix.util :as u])
+  (:import (clojure.lang Seqable IPersistentStack)))
 
 (def postfix-arg (partial gensym "postfix-arg"))
 
-(defrecord PostfixProgram [stack arg-source num-args]
-  clojure.lange.IPersistentStack)
+(defprotocol IPostfixProgram
+  (args-used [prog] "Return the number of args used by this program."))
+
+(deftype PostfixProgram [stack arg-source args-used]
+  Seqable
+  (seq [this] (seq stack))
+
+  IPersistentStack
+  (cons [this v] (PostfixProgram. (conj stack v) arg-source args-used))
+  (peek [this] nil)
+  (pop [this] this)
+
+  IPostfixProgram
+  (args-used [prog] args-used))
+
+(defn empty-program []
+  (->PostfixProgram [] (repeatedly postfix-arg) 0))
 
 (defn swap [stack]
   (let [n1 (peek stack)

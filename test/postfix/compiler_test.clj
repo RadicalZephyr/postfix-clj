@@ -2,6 +2,16 @@
   (:require [postfix.compiler :as sut]
             [clojure.test :as t]))
 
+(t/deftest postfix-program-test
+  (t/is (nil? (seq (sut/empty-program))))
+
+  (t/is (= '(1)
+           (-> (sut/empty-program)
+               (conj 1)
+               seq)))
+
+  (t/is (= 0 (sut/args-used (sut/empty-program)))))
+
 (defmacro postfix-test [postfix-prog args result]
   `(t/is (~'= (~postfix-prog ~@args)
           ~result)))
