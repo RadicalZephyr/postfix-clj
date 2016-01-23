@@ -3,7 +3,8 @@
   (:require [clojure.string :as str]
             [clojure.template :as template]
             [postfix.util :as u])
-  (:import (clojure.lang Seqable IPersistentStack)))
+  (:import (clojure.lang Seqable IPersistentStack)
+           java.io.Writer))
 
 (def postfix-arg (partial gensym "postfix-arg"))
 
@@ -39,6 +40,15 @@
                          top
                          (when (> @args-used 0)
                            (first arg-source)))))
+
+(defmethod print-method PostfixProgram [program ^Writer w]
+  (.write w (format "#postfix.compiler.PostfixProgram[%d,"
+                    (args-used program)))
+  (print-method (seq program) w)
+  (.write w "]"))
+
+(defmethod print-dup PostfixProgram [program w]
+  (print-method program w))
 
 (defn empty-program []
   (->PostfixProgram [] (repeatedly postfix-arg) (atom 0)))
