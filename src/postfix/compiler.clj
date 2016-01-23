@@ -11,7 +11,11 @@
 (defprotocol IPostfixProgram
   (args-used [prog] "Return the number of args used by this program.")
   (-current-arg [prog] "Internal method for getting the \"current\" argument.")
-  (program-args [prog] "Return the argument vector for this program.")
+  (program-args* [prog n]
+    "Return an argument vector of size n for this program.
+
+    `n' cannot be less than the minimum number of args required.")
+  (program-args [prog] "Return the minimum required argument vector for this program.")
   (program-body [prog] "Return the body of this program."))
 
 (deftype PostfixProgram [stack arg-source args-used]
@@ -34,12 +38,23 @@
 
   IPostfixProgram
   (args-used [prog] @args-used)
-  (-current-arg [prog] (when (> @args-used 0) (nth arg-source (dec @args-used))))
-  (program-args [prog] (vec (take @args-used arg-source)))
-  (program-body [prog] (if-let [top (peek stack)]
-                         top
-                         (when (> @args-used 0)
-                           (first arg-source)))))
+  (-current-arg [prog]
+    (when (> @args-used 0) (nth arg-source (dec @args-used))))
+
+  (program-args* [prog n]
+    (if (>= n @args-used)
+      (vec (take n arg-source))
+      (throw (ex-info "Too few arguments specified for program."
+                      {:program prog
+                       :requested-arg-count n
+                       :needed-arg-count @args-used}))))
+  (program-args [prog] (program-args* prog @args-used))
+
+  (program-body [prog]
+    (if-let [top (peek stack)]
+      top
+      (when (> @args-used 0)
+        (first arg-source)))))
 
 (defmethod print-method PostfixProgram [program ^Writer w]
   (.write w (format "#postfix.compiler.PostfixProgram[%d,"

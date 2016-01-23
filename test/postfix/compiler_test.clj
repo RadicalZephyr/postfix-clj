@@ -27,7 +27,8 @@
   (t/testing "the empty program"
     (t/testing "has arguments"
       (t/is (= 0 (sut/args-used (sut/empty-program))))
-      (t/is (= [] (sut/program-args (sut/empty-program)))))
+      (t/is (= [] (sut/program-args (sut/empty-program))))
+      (t/is (every? symbol? (sut/program-args* (sut/empty-program) 2))))
 
     (t/testing "has a nil body"
       (t/is (nil? (sut/program-body (sut/empty-program))))))
