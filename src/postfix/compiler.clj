@@ -9,7 +9,9 @@
 
 (defprotocol IPostfixProgram
   (args-used [prog] "Return the number of args used by this program.")
-  (program-args [prog] "Return the argument vector for this program."))
+  (-current-arg [prog] "Internal method for getting the \"current\" argument.")
+  (program-args [prog] "Return the argument vector for this program.")
+  (program-body [prog] "Return the body of this program."))
 
 (deftype PostfixProgram [stack arg-source ^:volatile-mutable args-used]
   Seqable
@@ -21,7 +23,7 @@
                  (peek stack)
                  (do
                    (when (= 0 args-used) (set! args-used 1))
-                   (nth arg-source args-used))))
+                   (-current-arg this))))
   (pop [this]
     (if (seq stack)
       (PostfixProgram. (pop stack) arg-source args-used)
@@ -29,7 +31,12 @@
 
   IPostfixProgram
   (args-used [prog] args-used)
-  (program-args [prog] (vec (take args-used arg-source))))
+  (-current-arg [prog] (nth arg-source (dec args-used)))
+  (program-args [prog] (vec (take args-used arg-source)))
+  (program-body [prog] (if-let [top (peek stack)]
+                         top
+                         (when (> args-used 0)
+                           (first arg-source)))))
 
 (defn empty-program []
   (->PostfixProgram [] (repeatedly postfix-arg) 0))
