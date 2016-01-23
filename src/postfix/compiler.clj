@@ -6,6 +6,9 @@
 
 (def postfix-arg (partial gensym "postfix-arg"))
 
+(defrecord PostfixProgram [stack arg-source num-args]
+  clojure.lange.IPersistentStack)
+
 (defn swap [stack]
   (let [n1 (peek stack)
         n2 (peek (pop stack))]
