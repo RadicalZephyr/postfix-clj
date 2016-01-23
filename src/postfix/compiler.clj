@@ -13,7 +13,7 @@
   (program-args [prog] "Return the argument vector for this program.")
   (program-body [prog] "Return the body of this program."))
 
-(deftype PostfixProgram [stack arg-source ^:volatile-mutable args-used]
+(deftype PostfixProgram [stack arg-source args-used]
   Seqable
   (seq [this] (seq stack))
 
@@ -22,24 +22,26 @@
   (peek [this] (if (seq stack)
                  (peek stack)
                  (do
-                   (when (= 0 args-used) (set! args-used 1))
+                   (when (= 0 @args-used) (swap! args-used inc))
                    (-current-arg this))))
   (pop [this]
     (if (seq stack)
       (PostfixProgram. (pop stack) arg-source args-used)
-      (PostfixProgram. stack arg-source (inc args-used))))
+      (do
+        (swap! args-used inc)
+        this)))
 
   IPostfixProgram
-  (args-used [prog] args-used)
-  (-current-arg [prog] (nth arg-source (dec args-used)))
-  (program-args [prog] (vec (take args-used arg-source)))
+  (args-used [prog] @args-used)
+  (-current-arg [prog] (when (> @args-used 0) (nth arg-source (dec @args-used))))
+  (program-args [prog] (vec (take @args-used arg-source)))
   (program-body [prog] (if-let [top (peek stack)]
                          top
-                         (when (> args-used 0)
+                         (when (> @args-used 0)
                            (first arg-source)))))
 
 (defn empty-program []
-  (->PostfixProgram [] (repeatedly postfix-arg) 0))
+  (->PostfixProgram [] (repeatedly postfix-arg) (atom 0)))
 
 (defn swap [stack]
   (let [n1 (peek stack)

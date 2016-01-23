@@ -48,7 +48,7 @@
        (t/is (= 1 (count args))))
 
      (t/testing "args-used and program-args should be the same"
-       (t/is [arg] (sut/program-args program)))
+       (t/is (= [arg] (sut/program-args program))))
 
      (t/testing "has argument as body if no program given"
        (t/is (= arg (sut/program-body program))))))
@@ -56,8 +56,8 @@
   (t/testing "a program that has used more than one arg"
     (let [program (sut/empty-program)
           arg-sym1 (peek program)
-          program (pop program)
-          arg-sym2 (peek program)]
+          program-popped (pop program)
+          arg-sym2 (peek program-popped)]
 
       (t/is (symbol? arg-sym1))
       (t/is (str/starts-with? (name arg-sym1) "postfix-arg"))
