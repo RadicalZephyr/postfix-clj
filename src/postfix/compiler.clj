@@ -139,8 +139,8 @@
   (throw (ex-info "Encountered unknown instruction."
                   {:stack stack :instruction instruction})))
 
-(defmethod compile-instruction :number [stack instruction]
-  (conj stack instruction))
+(defmethod compile-instruction :number [stack value]
+  (conj stack value))
 
 (defn lookup [instruction]
   (if-let [fn (ns-resolve (find-ns 'postfix.compiler)
@@ -154,8 +154,8 @@
 
 (declare postfix*)
 
-(defmethod compile-instruction :executable-sequence [stack instruction]
-  (conj stack (postfix* 1 instruction)))
+(defmethod compile-instruction :executable-sequence [stack executable-sequence]
+  (conj stack (postfix* 1 executable-sequence)))
 
 (defn make-arg-vector [num-args]
   (vec (repeatedly num-args postfix-arg)))
@@ -163,10 +163,10 @@
 (defn compile-instructions [stack instructions]
   (reduce compile-instruction stack instructions))
 
-(defn postfix* [num-args program]
+(defn postfix* [num-args instructions]
   (let [program-args (make-arg-vector num-args)
         arg-stack (vec (reverse program-args))
-        compiled-program (compile-instructions arg-stack program)
+        compiled-program (compile-instructions arg-stack instructions)
         ret (peek compiled-program)]
     `(fn ~program-args ~ret)))
 
