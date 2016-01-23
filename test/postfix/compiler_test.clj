@@ -67,7 +67,22 @@
       (t/testing "args-used and programs-args should be the same"
         (t/is (= 2 (sut/args-used program)))
         (t/is (= 2 (count (sut/program-args program))))
-        (t/is (= [arg-sym1 arg-sym2] (sut/program-args program)))))))
+        (t/is (= [arg-sym1 arg-sym2] (sut/program-args program))))))
+
+  (t/testing "complex stack usage"
+    (t/testing "with nget"
+      (let [program (conj (sut/empty-program) 1)
+            program (sut/nget program)]
+        (t/is (= 1 (sut/args-used program))))
+      (let [program (conj (sut/empty-program) 3)
+            program (sut/nget program)]
+        (t/is (= 3 (sut/args-used program))))
+      (let [program (sut/nget (sut/empty-program))]
+        (t/is (= 3 (sut/args-used program)))))
+
+    (t/testing "with swap"
+      (let [program (sut/swap (sut/empty-program))]
+        (t/is (= 2 (sut/args-used program)))))))
 
 (defmacro postfix-test [postfix-prog args result]
   `(t/is (~'= (~postfix-prog ~@args)
