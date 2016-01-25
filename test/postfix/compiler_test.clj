@@ -60,6 +60,8 @@
                   [3] 11))
 
   (t/testing "Programs with nget"
+    (postfix-test (sut/postfix 1 1 nget mul)
+                  [5] 25)
     (postfix-test (sut/postfix 2 1 nget)
                   [4 5] 4)
     (postfix-test (sut/postfix 2 2 nget)
