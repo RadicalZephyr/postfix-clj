@@ -42,11 +42,7 @@
 (defn exec [stack]
   (let [top (peek stack)
         stack (pop stack)]
-    (if (or (executable-sequence? top)
-            (postfix-arg-sym? top))
-      (conj stack `(~top ~@(take 2 (reverse stack))))
-      (throw (ex-info "'exec' called on a non-executable sequence"
-                      {:argument top :stack stack})))))
+    (conj stack `(~top ~@(take 2 (reverse stack))))))
 
 (defn wrap-bool [f]
   (fn [l r] (if (f l r) 1 0)))
