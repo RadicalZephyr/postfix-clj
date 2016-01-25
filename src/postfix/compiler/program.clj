@@ -15,7 +15,11 @@
 
 (deftype PostfixProgram [stack depth arg-source args-used]
   Seqable
-  (seq [this] (seq stack))
+  (seq [this] (seq (concat (->> arg-source
+                                (drop depth)
+                                (take (- @args-used depth))
+                                reverse)
+                           stack)))
 
   IPersistentStack
   (cons [this v] (PostfixProgram. (conj stack v) depth arg-source args-used))
@@ -55,6 +59,9 @@
 (defmethod print-dup PostfixProgram [program w]
   (print-method program w))
 
-(defn empty-program []
-  (let [args (repeatedly postfix-arg)]
-    (->PostfixProgram [] 0 args (atom 0))))
+(defn empty-program
+  ([] (empty-program 0))
+
+  ([expected-args]
+   (let [args (repeatedly postfix-arg)]
+     (->PostfixProgram [] 0 args (atom expected-args)))))

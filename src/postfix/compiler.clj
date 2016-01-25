@@ -1,6 +1,6 @@
 (ns postfix.compiler
-  (:require [postfix.compiler.program :as prog]
-            [postfix.compiler.operators]))
+  (:require [postfix.compiler.operators]
+            [postfix.compiler.program :as prog]))
 
 (defmulti compile-instruction
   (fn [stack instruction]
@@ -30,20 +30,28 @@
 (declare postfix*)
 
 (defmethod compile-instruction :executable-sequence [stack executable-sequence]
-  (conj stack (postfix* 1 executable-sequence)))
+  (conj stack (postfix* executable-sequence)))
 
-(defn make-arg-vector [num-args]
-  (vec (repeatedly num-args prog/postfix-arg)))
+(defn compile-instructions [program instructions]
+  (reduce compile-instruction program instructions))
 
-(defn compile-instructions [stack instructions]
-  (reduce compile-instruction stack instructions))
+(defn generate-program-fn
+  ([compiled-program]
+   (generate-program-fn compiled-program (prog/args-used compiled-program)))
 
-(defn postfix* [num-args instructions]
-  (let [program-args (make-arg-vector num-args)
-        arg-stack (vec (reverse program-args))
-        compiled-program (compile-instructions arg-stack instructions)
-        ret (peek compiled-program)]
-    `(fn ~program-args ~ret)))
+  ([compiled-program num-args]
+   (let [program-args (prog/program-args* compiled-program num-args)
+         body (prog/program-body compiled-program)]
+     `(fn ~program-args ~body))))
 
-(defmacro postfix [num-args & program]
-  (postfix* num-args program))
+(defn postfix*
+  ([instructions]
+   (let [compiled-program (compile-instructions (prog/empty-program) instructions)]
+     (generate-program-fn compiled-program)))
+
+  ([num-args instructions]
+   (let [compiled-program (compile-instructions (prog/empty-program num-args) instructions)]
+     (generate-program-fn compiled-program num-args))))
+
+(defmacro postfix [num-args & instructions]
+  (postfix* num-args instructions))
