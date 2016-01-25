@@ -10,7 +10,6 @@
 
 (defprotocol IPostfixProgram
   (args-used [prog] "Return the number of args used by this program.")
-  (-current-arg [prog] "Internal method for getting the \"current\" argument.")
   (program-args* [prog n]
     "Return an argument vector of size n for this program.
 
@@ -18,29 +17,24 @@
   (program-args [prog] "Return the minimum required argument vector for this program.")
   (program-body [prog] "Return the body of this program."))
 
-(deftype PostfixProgram [stack arg-source args-used]
+(deftype PostfixProgram [stack depth arg-source args-used]
   Seqable
   (seq [this] (seq stack))
 
   IPersistentStack
-  (cons [this v] (PostfixProgram. (conj stack v) arg-source args-used))
+  (cons [this v] (PostfixProgram. (conj stack v) depth arg-source args-used))
   (peek [this] (if (seq stack)
                  (peek stack)
                  (do
-                   (when (= 0 @args-used) (swap! args-used inc))
-                   (-current-arg this))))
+                   (swap! args-used max (inc depth))
+                   (nth arg-source depth))))
   (pop [this]
     (if (seq stack)
-      (PostfixProgram. (pop stack) arg-source args-used)
-      (do
-        (swap! args-used inc)
-        this)))
+      (PostfixProgram. (pop stack) depth arg-source args-used)
+      (PostfixProgram. stack (inc depth) arg-source args-used)))
 
   IPostfixProgram
   (args-used [prog] @args-used)
-  (-current-arg [prog]
-    (when (> @args-used 0) (nth arg-source (dec @args-used))))
-
   (program-args* [prog n]
     (if (>= n @args-used)
       (vec (take n arg-source))
@@ -66,7 +60,8 @@
   (print-method program w))
 
 (defn empty-program []
-  (->PostfixProgram [] (repeatedly postfix-arg) (atom 0)))
+  (let [args (repeatedly postfix-arg)]
+    (->PostfixProgram [] 0 args (atom 0))))
 
 (defn swap [stack]
   (let [n1 (peek stack)
