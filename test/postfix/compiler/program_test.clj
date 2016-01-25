@@ -78,8 +78,8 @@
       (let [program (conj (sut/empty-program) 3)
             program (op/nget program)]
         (t/is (= 3 (sut/args-used program))))
-      #_(let [program (op/nget (sut/empty-program))]
-        (t/is (= 3 (sut/args-used program)))))
+      (let [program (op/nget (sut/empty-program))]
+        (t/is (= 1 (sut/args-used program)))))
 
     (t/testing "with swap"
       (let [program (op/swap (sut/empty-program))]

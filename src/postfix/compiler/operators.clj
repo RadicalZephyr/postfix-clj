@@ -12,10 +12,12 @@
         (conj n2))))
 
 (defn nget [stack]
-  (let [n (peek stack)
-        data (peek (u/popn stack n))]
+  (let [n (peek stack)]
     (-> stack pop
-        (conj data))))
+        (conj
+         (if (number? n)
+           (u/peekn stack n)
+           `(u/peekn ~(vec (seq stack)) ~n))))))
 
 (defn sel [stack]
   (let [pred (peek (u/popn stack 2))
