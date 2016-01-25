@@ -22,7 +22,11 @@
   (t/is (= 1 (-> (sut/empty-program)
                  (conj 1 2)
                  pop
-                 peek))))
+                 peek)))
+
+  (t/is (= [1 2] (-> (sut/empty-program)
+                     (conj 2 1)
+                     reverse))))
 
 (t/deftest postfix-program-has-other-attributes
   (t/testing "the empty program"
