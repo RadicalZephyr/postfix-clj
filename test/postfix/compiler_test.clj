@@ -91,4 +91,6 @@
     (postfix-test (sut/postfix 4 lt (add) (mul) sel exec)
                   [3 4 5 6] 11)
     (postfix-test (sut/postfix 4 lt (add) (mul) sel exec)
-                  [4 3 5 6] 30)))
+                  [4 3 5 6] 30)
+    #_(postfix-test (sut/postfix 2 (mul sub) (1 nget mul) 4 nget swap exec swap exec)
+                  [-10 2] 42)))
