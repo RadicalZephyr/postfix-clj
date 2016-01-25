@@ -5,14 +5,14 @@
             [postfix.util :as u]))
 
 (defn swap [stack]
-  (let [n1 (peek stack)
-        n2 (peek (pop stack))]
+  (let [n1 (u/peekn stack 0)
+        n2 (u/peekn stack 1)]
     (-> stack pop pop
         (conj n1)
         (conj n2))))
 
 (defn nget [stack]
-  (let [n (peek stack)]
+  (let [n (u/peekn stack 0)]
     (-> stack pop
         (conj
          (if (number? n)
@@ -20,9 +20,9 @@
            `(u/peekn ~(vec (seq stack)) ~n))))))
 
 (defn sel [stack]
-  (let [pred (peek (u/popn stack 2))
-        else (peek (pop stack))
-        then (peek stack)
+  (let [pred (u/peekn stack 2)
+        else (u/peekn stack 1)
+        then (u/peekn stack 0)
         stack (u/popn stack 3)]
     (if (number? pred)
       (if (= pred 0)
@@ -57,8 +57,8 @@
 
 (defmacro defbinary-stack-op [name operator]
   `(defn ~name [stack#]
-     (let [~'n1 (peek stack#)
-           ~'n2 (peek (pop stack#))]
+     (let [~'n1 (u/peekn stack# 0)
+           ~'n2 (u/peekn stack# 1)]
        (-> stack# pop pop
            (conj (make-operation ~operator ~'n2 ~'n1))))))
 
