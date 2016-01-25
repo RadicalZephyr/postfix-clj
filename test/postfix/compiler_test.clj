@@ -63,13 +63,23 @@
     (postfix-test (sut/postfix 2 1 nget)
                   [4 5] 4)
     (postfix-test (sut/postfix 2 2 nget)
-                  [4 5] 5))
+                  [4 5] 5)
+    (postfix-test (sut/postfix 2 nget)
+                  [1 5] 5)
+    (postfix-test (sut/postfix 5 sel nget)
+                  [1 2 0 9 8] 8)
+    (postfix-test (sut/postfix 5 sel nget)
+                  [1 2 1 9 8] 9))
 
   (t/testing "Programs with sel"
     (postfix-test (sut/postfix 1 2 3 sel)
                   [1] 3)
     (postfix-test (sut/postfix 1 2 3 sel)
-                  [0] 2))
+                  [0] 2)
+    (postfix-test (sut/postfix 3 sel)
+                  [3 2 0] 2)
+    (postfix-test (sut/postfix 3 sel)
+                  [3 2 1] 3))
 
   (t/testing "Programs with executable sequences"
     (postfix-test (sut/postfix 0 (0 swap sub) 7 swap exec)
