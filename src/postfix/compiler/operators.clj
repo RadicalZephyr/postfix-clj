@@ -5,8 +5,28 @@
             [postfix.util :as u]))
 
 (defprotocol IPostfixOperator
+  (expression-type [op]
+    "Get the ultimate type of this expression.")
   (compile-operator [op]
     "Compile this operator into code."))
+
+(extend-type clojure.lang.ISeq
+  IPostfixOperator
+  (expression-type [op])
+  (compile-operator [op] op))
+
+(extend-type clojure.lang.IPersistentVector
+  IPostfixOperator
+  (expression-type [[operator-key data]]
+    (if (satisfies? IPostfixOperator data)
+      (expression-type data)
+      (throw (ex-info "Tried to get type of non-operator."
+                      {:operator data}))))
+  (compile-operator [[operator-key data]]
+    (if (satisfies? IPostfixOperator data)
+      (compile-operator data)
+      (throw (ex-info "Tried to compile non-operator."
+                      {:operator data})))))
 
 (defn swap [stack]
   (let [n1 (u/peekn stack 0)

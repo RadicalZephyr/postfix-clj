@@ -41,7 +41,7 @@
   value)
 
 (defmethod compile-ast-node :operator [[_ data]]
-  data)
+  (op/compile-operator data))
 
 (declare compile-ast)
 
