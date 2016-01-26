@@ -23,11 +23,12 @@
 
   IPersistentStack
   (cons [this v] (PostfixProgram. (conj stack v) depth arg-source args-used))
-  (peek [this] (if (seq stack)
-                 (peek stack)
-                 (do
-                   (swap! args-used max (inc depth))
-                   (nth arg-source depth))))
+  (peek [this]
+    (if (seq stack)
+      (peek stack)
+      (do
+        (swap! args-used max (inc depth))
+        (nth arg-source depth))))
   (pop [this]
     (if (seq stack)
       (PostfixProgram. (pop stack) depth arg-source args-used)
