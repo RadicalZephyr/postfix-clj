@@ -15,29 +15,14 @@
   (let [n (u/peekn stack 0)]
     (-> stack pop
         (conj
-         (if (number? n)
-           (u/peekn stack n)
-           `(u/peekn ~(vec (seq stack)) ~n))))))
+         `(u/peekn ~(vec (seq stack)) ~n)))))
 
 (defn sel [stack]
   (let [pred (u/peekn stack 2)
         else (u/peekn stack 1)
         then (u/peekn stack 0)
         stack (u/popn stack 3)]
-    (if (number? pred)
-      (if (= pred 0)
-        (conj stack else)
-        (conj stack then))
-      (conj stack `(if (= ~pred 0) ~else ~then)))))
-
-(defn executable-sequence? [val]
-  (and (seq? val)
-       (= (first val)
-          'clojure.core/fn)))
-
-(defn postfix-arg-sym? [val]
-  (and (symbol? val)
-       (-> val name (str/starts-with? "postfix-arg"))))
+    (conj stack `(if (= ~pred 0) ~else ~then))))
 
 (defn exec [stack]
   (let [top (peek stack)
@@ -51,9 +36,7 @@
 (def gt-fn `(wrap-bool >))
 
 (defn make-operation [op l r]
-  (if (and (number? l) (number? r))
-    (op l r)
-    (list op l r)))
+  (list op l r))
 
 (defmacro defbinary-stack-op [name operator]
   `(defn ~name [stack#]
