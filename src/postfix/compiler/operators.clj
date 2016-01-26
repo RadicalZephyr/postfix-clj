@@ -4,6 +4,10 @@
             [clojure.template :as template]
             [postfix.util :as u]))
 
+(defprotocol IPostfixOperator
+  (compile-operator [op]
+    "Compile this operator into code."))
+
 (defn swap [stack]
   (let [n1 (u/peekn stack 0)
         n2 (u/peekn stack 1)]
@@ -57,3 +61,8 @@
   rem clojure.core/rem
   lt lt-fn
   gt gt-fn)
+
+(defn build-ast-node
+  "Create the AST node for this operator from the given stack."
+  [op stack]
+  ((ns-resolve (find-ns 'postfix.compiler.operators) op) stack))

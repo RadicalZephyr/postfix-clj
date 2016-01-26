@@ -1,6 +1,6 @@
 (ns postfix.compiler
   (:require [clojure.walk :as w]
-            [postfix.compiler.operators]
+            [postfix.compiler.operators :as op]
             [postfix.compiler.program :as prog]))
 
 (defmulti instruction->ast
@@ -18,15 +18,11 @@
 (defmethod instruction->ast :number [stack value]
   (conj stack value))
 
-(defn lookup [instruction]
-  (if-let [fn (ns-resolve (find-ns 'postfix.compiler.operators)
-                          instruction)]
-    fn
+(defmethod instruction->ast :command [stack instruction]
+  (if-let [ast-node (op/build-ast-node instruction stack)]
+    ast-node
     (throw (ex-info "Could not resolve symbol"
                     {:instruction instruction}))))
-
-(defmethod instruction->ast :command [stack instruction]
-  ((lookup instruction) stack))
 
 (declare make-executable-sequence)
 
