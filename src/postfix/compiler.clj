@@ -1,5 +1,6 @@
 (ns postfix.compiler
-  (:require [postfix.compiler.operators]
+  (:require [clojure.walk :as w]
+            [postfix.compiler.operators]
             [postfix.compiler.program :as prog]))
 
 (defmulti instruction->ast
@@ -37,23 +38,29 @@
 
 (defmulti compile-ast-node first)
 
-(defmethod compile-ast-node :default [ast]
-  ast)
+(defmethod compile-ast-node :default [ast-node]
+  ast-node)
+
+(defmethod compile-ast-node :number [[_ value]]
+  value)
+
+(defn dispatch-node [ast-node]
+  (if (vector? ast-node)
+    (compile-ast-node ast-node)
+    ast-node))
 
 (defn compile-ast [ast]
-  ast)
+  (w/postwalk dispatch-node ast))
 
 (defn make-executable-sequence [instructions]
   (let [ast (build-ast (prog/empty-program) instructions)
         args-used (prog/args-used ast)
-        compiled-program (compile-ast ast)
         program-args (prog/program-args* ast args-used)
-        body (prog/program-body ast)]
-    `(fn ~program-args ~body)))
+        compiled-program (compile-ast (prog/program-body ast))]
+    `(fn ~program-args ~compiled-program)))
 
 (defmacro postfix [num-args & instructions]
   (let [ast (build-ast (prog/empty-program num-args) instructions)
-        compiled-program (compile-ast ast)
         program-args (prog/program-args* ast num-args)
-        body (prog/program-body ast)]
-    `(fn ~program-args ~body)))
+        compiled-program (compile-ast (prog/program-body ast))]
+    `(fn ~program-args ~compiled-program)))
