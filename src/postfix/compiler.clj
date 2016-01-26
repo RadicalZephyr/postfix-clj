@@ -27,10 +27,10 @@
 (defmethod compile-instruction :command [stack instruction]
   ((lookup instruction) stack))
 
-(declare postfix*)
+(declare make-executable-sequence)
 
-(defmethod compile-instruction :executable-sequence [stack executable-sequence]
-  (conj stack (postfix* executable-sequence)))
+(defmethod compile-instruction :executable-sequence [stack instructions]
+  (conj stack (make-executable-sequence instructions)))
 
 (defn compile-instructions [program instructions]
   (reduce compile-instruction program instructions))
@@ -44,14 +44,10 @@
          body (prog/program-body compiled-program)]
      `(fn ~program-args ~body))))
 
-(defn postfix*
-  ([instructions]
-   (let [compiled-program (compile-instructions (prog/empty-program) instructions)]
-     (generate-program-fn compiled-program)))
-
-  ([num-args instructions]
-   (let [compiled-program (compile-instructions (prog/empty-program num-args) instructions)]
-     (generate-program-fn compiled-program num-args))))
+(defn make-executable-sequence [instructions]
+  (let [compiled-program (compile-instructions (prog/empty-program) instructions)]
+    (generate-program-fn compiled-program)))
 
 (defmacro postfix [num-args & instructions]
-  (postfix* num-args instructions))
+  (let [compiled-program (compile-instructions (prog/empty-program num-args) instructions)]
+    (generate-program-fn compiled-program num-args)))
