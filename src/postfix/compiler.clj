@@ -44,6 +44,9 @@
 (defmethod compile-ast-node :number [[_ value]]
   value)
 
+(defmethod compile-ast-node :operator [[_ data]]
+  data)
+
 (declare compile-ast)
 
 (defmethod compile-ast-node :executable-sequence [[_ data]]

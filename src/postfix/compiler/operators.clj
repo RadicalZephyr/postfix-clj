@@ -15,19 +15,21 @@
   (let [n (u/peekn stack 0)]
     (-> stack pop
         (conj
-         `(u/peekn ~(vec (seq stack)) ~n)))))
+         [:operator `(u/peekn ~(vec (seq stack)) ~n)]))))
 
 (defn sel [stack]
   (let [pred (u/peekn stack 2)
         else (u/peekn stack 1)
         then (u/peekn stack 0)
         stack (u/popn stack 3)]
-    (conj stack `(if (= ~pred 0) ~else ~then))))
+    (conj stack
+          [:operator `(if (= ~pred 0) ~else ~then)])))
 
 (defn exec [stack]
   (let [top (peek stack)
         stack (pop stack)]
-    (conj stack `(~top ~@(take 2 (reverse stack))))))
+    (conj stack
+          [:operator `(~top ~@(take 2 (reverse stack)))])))
 
 (defn wrap-bool [f]
   (fn [l r] (if (f l r) 1 0)))
@@ -40,7 +42,7 @@
      (let [n1# (u/peekn stack# 0)
            n2# (u/peekn stack# 1)]
        (-> stack# pop pop
-           (conj (list ~operator n2# n1#))))))
+           (conj [:operator (list ~operator n2# n1#)])))))
 
 (defmacro defbinary-stack-ops [& args]
   `(template/do-template [name op]
