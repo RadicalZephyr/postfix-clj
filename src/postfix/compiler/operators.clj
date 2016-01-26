@@ -4,19 +4,31 @@
             [clojure.template :as template]
             [postfix.util :as u]))
 
+(def ^:dynamic compiling-top-level true)
+
 (defprotocol IPostfixOperator
   (expression-type [op]
     "Get the ultimate type of this expression.")
   (compile-operator [op]
     "Compile this operator into code."))
 
-(extend-type clojure.lang.ISeq
-  IPostfixOperator
+(extend-protocol IPostfixOperator
+  clojure.lang.ISeq
   (expression-type [op])
-  (compile-operator [op] op))
+  (compile-operator [op] op)
 
-(extend-type clojure.lang.IPersistentVector
-  IPostfixOperator
+  java.lang.Number
+  (expression-type [op] :number)
+  (compile-operator [op] op)
+
+  clojure.lang.Symbol
+  (expression-type [op]
+    (if compiling-top-level
+      :numeric-argument
+      :argument))
+  (compile-operator [op] op)
+
+  clojure.lang.IPersistentVector
   (expression-type [[operator-key data]]
     (if (satisfies? IPostfixOperator data)
       (expression-type data)
