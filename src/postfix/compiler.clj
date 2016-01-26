@@ -44,6 +44,13 @@
 (defmethod compile-ast-node :number [[_ value]]
   value)
 
+(declare compile-ast)
+
+(defmethod compile-ast-node :executable-sequence [[_ data]]
+  (let [{:keys [program-args program-ast]} data
+        compiled-program (compile-ast program-ast)]
+    `(fn ~program-args ~compiled-program)))
+
 (defn dispatch-node [ast-node]
   (if (vector? ast-node)
     (compile-ast-node ast-node)
@@ -56,8 +63,9 @@
   (let [ast (build-ast (prog/empty-program) instructions)
         args-used (prog/args-used ast)
         program-args (prog/program-args* ast args-used)
-        compiled-program (compile-ast (prog/program-body ast))]
-    `(fn ~program-args ~compiled-program)))
+        program-ast (prog/program-body ast)]
+    [:executable-sequence {:program-args program-args
+                           :program-ast program-ast}]))
 
 (defmacro postfix [num-args & instructions]
   (let [ast (build-ast (prog/empty-program num-args) instructions)
