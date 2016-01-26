@@ -35,15 +35,12 @@
 (def lt-fn `(wrap-bool <))
 (def gt-fn `(wrap-bool >))
 
-(defn make-operation [op l r]
-  (list op l r))
-
 (defmacro defbinary-stack-op [name operator]
   `(defn ~name [stack#]
-     (let [~'n1 (u/peekn stack# 0)
-           ~'n2 (u/peekn stack# 1)]
+     (let [n1# (u/peekn stack# 0)
+           n2# (u/peekn stack# 1)]
        (-> stack# pop pop
-           (conj (make-operation ~operator ~'n2 ~'n1))))))
+           (conj (list ~operator n2# n1#))))))
 
 (defmacro defbinary-stack-ops [& args]
   `(template/do-template [name op]
