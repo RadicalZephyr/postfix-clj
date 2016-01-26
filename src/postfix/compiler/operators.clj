@@ -62,7 +62,22 @@
   lt lt-fn
   gt gt-fn)
 
+(def operator-build-fns
+  {:pop pop
+   :swap swap
+   :nget nget
+   :sel sel
+   :exec exec
+
+   :add add
+   :sub sub
+   :mul mul
+   :div div
+   :rem rem
+   :lt lt
+   :gt gt})
+
 (defn build-ast-node
   "Create the AST node for this operator from the given stack."
   [op stack]
-  ((ns-resolve (find-ns 'postfix.compiler.operators) op) stack))
+  ((operator-build-fns (keyword op)) stack))
