@@ -2,7 +2,7 @@
   (:require [postfix.compiler.operators]
             [postfix.compiler.program :as prog]))
 
-(defmulti compile-instruction
+(defmulti instruction->ast
   (fn [stack instruction]
     (cond
       (number? instruction) :number
@@ -10,11 +10,11 @@
       (list? instruction) :executable-sequence
       :else :default)))
 
-(defmethod compile-instruction :default [stack instruction]
+(defmethod instruction->ast :default [stack instruction]
   (throw (ex-info "Encountered unknown instruction."
                   {:stack stack :instruction instruction})))
 
-(defmethod compile-instruction :number [stack value]
+(defmethod instruction->ast :number [stack value]
   (conj stack value))
 
 (defn lookup [instruction]
@@ -24,16 +24,24 @@
     (throw (ex-info "Could not resolve symbol"
                     {:instruction instruction}))))
 
-(defmethod compile-instruction :command [stack instruction]
+(defmethod instruction->ast :command [stack instruction]
   ((lookup instruction) stack))
 
 (declare make-executable-sequence)
 
-(defmethod compile-instruction :executable-sequence [stack instructions]
+(defmethod instruction->ast :executable-sequence [stack instructions]
   (conj stack (make-executable-sequence instructions)))
 
-(defn compile-instructions [program instructions]
-  (reduce compile-instruction program instructions))
+(defn build-ast [program instructions]
+  (reduce instruction->ast program instructions))
+
+(defmulti compile-ast-node first)
+
+(defmethod compile-ast-node :default [ast]
+  ast)
+
+(defn compile-ast [ast]
+  ast)
 
 (defn generate-program-fn
   ([compiled-program]
@@ -45,9 +53,11 @@
      `(fn ~program-args ~body))))
 
 (defn make-executable-sequence [instructions]
-  (let [compiled-program (compile-instructions (prog/empty-program) instructions)]
+  (let [ast (build-ast (prog/empty-program) instructions)
+        compiled-program (compile-ast ast)]
     (generate-program-fn compiled-program)))
 
 (defmacro postfix [num-args & instructions]
-  (let [compiled-program (compile-instructions (prog/empty-program num-args) instructions)]
+  (let [ast (build-ast (prog/empty-program num-args) instructions)
+        compiled-program (compile-ast ast)]
     (generate-program-fn compiled-program num-args)))
