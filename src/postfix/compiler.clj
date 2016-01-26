@@ -32,32 +32,6 @@
 (defn build-ast [program instructions]
   (reduce instruction->ast program instructions))
 
-(defmulti compile-ast-node first)
-
-(defmethod compile-ast-node :default [ast-node]
-  ast-node)
-
-(defmethod compile-ast-node :number [[_ value]]
-  value)
-
-(defmethod compile-ast-node :operator [[_ data]]
-  (op/compile-operator data))
-
-(declare compile-ast)
-
-(defmethod compile-ast-node :executable-sequence [[_ data]]
-  (let [{:keys [program-args program-ast]} data
-        compiled-program (compile-ast program-ast)]
-    `(fn ~program-args ~compiled-program)))
-
-(defn dispatch-node [ast-node]
-  (if (vector? ast-node)
-    (compile-ast-node ast-node)
-    ast-node))
-
-(defn compile-ast [ast]
-  (w/postwalk dispatch-node ast))
-
 (defn make-executable-sequence [instructions]
   (let [ast (build-ast (prog/empty-program) instructions)
         args-used (prog/args-used ast)
@@ -65,6 +39,37 @@
         program-ast (prog/program-body ast)]
     [:executable-sequence {:program-args program-args
                            :program-ast program-ast}]))
+
+(declare compile-ast)
+
+(defn compile-operator-node [data]
+  (op/compile-operator data))
+
+(defn compile-executable-sequence-node [data]
+  (let [{:keys [program-args program-ast]} data
+        compiled-program (compile-ast program-ast)]
+    `(fn ~program-args ~compiled-program)))
+
+(defn merge-meta [obj metamap]
+  (if (instance? clojure.lang.IObj obj)
+    (with-meta obj (merge metamap (meta obj)))
+    obj))
+
+(def compile-map {:number identity
+                  :operator compile-operator-node
+                  :executable-sequence compile-executable-sequence-node})
+
+(defn compile-ast [parse-tree]
+  (if (and (sequential? parse-tree) (seq parse-tree))
+    (cond
+      (vector? parse-tree)
+      (if-let [transform (compile-map (first parse-tree))]
+        (apply transform (map compile-ast
+                              (next parse-tree)))
+        (mapv compile-ast parse-tree))
+
+      :else (map compile-ast parse-tree))
+    parse-tree))
 
 (defmacro postfix [num-args & instructions]
   (let [ast (build-ast (prog/empty-program num-args) instructions)
