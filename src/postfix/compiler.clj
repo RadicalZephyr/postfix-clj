@@ -43,21 +43,12 @@
 (defn compile-ast [ast]
   ast)
 
-(defn generate-program-fn
-  ([compiled-program]
-   (generate-program-fn compiled-program (prog/args-used compiled-program)))
-
-  ([compiled-program num-args]
-   (let [program-args (prog/program-args* compiled-program num-args)
-         body (prog/program-body compiled-program)]
-     `(fn ~program-args ~body))))
-
 (defn make-executable-sequence [instructions]
   (let [ast (build-ast (prog/empty-program) instructions)
         compiled-program (compile-ast ast)]
-    (generate-program-fn compiled-program)))
+    (prog/generate-program-fn compiled-program)))
 
 (defmacro postfix [num-args & instructions]
   (let [ast (build-ast (prog/empty-program num-args) instructions)
         compiled-program (compile-ast ast)]
-    (generate-program-fn compiled-program num-args)))
+    (prog/generate-program-fn compiled-program num-args)))

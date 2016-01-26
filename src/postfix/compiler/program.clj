@@ -66,3 +66,12 @@
   ([expected-args]
    (let [args (repeatedly postfix-arg)]
      (->PostfixProgram [] 0 args (atom expected-args)))))
+
+(defn generate-program-fn
+  ([compiled-program]
+   (generate-program-fn compiled-program (args-used compiled-program)))
+
+  ([compiled-program num-args]
+   (let [program-args (program-args* compiled-program num-args)
+         body (program-body compiled-program)]
+     `(fn ~program-args ~body))))
